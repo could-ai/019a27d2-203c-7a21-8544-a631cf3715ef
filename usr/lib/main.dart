@@ -14,28 +14,39 @@ class MyApp extends StatelessWidget {
       title: 'Photobox Order',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: const Color(0xFF170B33),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
+          seedColor: Colors.purple,
+          brightness: Brightness.dark,
+          primary: Colors.purple.shade300,
+          secondary: Colors.amber,
         ),
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.grey[100],
+        scaffoldBackgroundColor: const Color(0xFF170B33),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
           titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
+            color: Colors.white,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
           ),
         ),
         cardTheme: CardTheme(
-          elevation: 1,
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 2,
+          color: const Color(0xFF23154C),
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
           ),
+        ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.white70),
+          headlineSmall: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       home: const PhotoboxOrderScreen(),
@@ -110,7 +121,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
 - Количество фотографий: $_selectedPhotoCount
 - Мини-альбом: $_selectedAlbum
 - Фономузыка: ${_withMusic! ? 'Да' : 'Нет'}
-- Итоговая сумма: $_totalPrice ₸
+- Итоговая сумма: $_totalPrice ₸ 
 """;
 
     // TODO: Replace with your actual phone number
@@ -139,10 +150,13 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text(
-            'Выберите формат, цвет, количество фотографий и доп. опции — и мы создадим ваш идеальный фотобокс.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.black54),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: const Text(
+              'Выберите формат, цвет, количество фотографий и доп. опции — и мы создадим ваш идеальный фотобокс.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.white70),
+            ),
           ),
           const SizedBox(height: 24),
           _buildSectionCard(
@@ -177,7 +191,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
                   _calculatePrice();
                 });
               },
-              labelBuilder: (key) => '$key (+${_albumOptions[key]} ₸)',
+              labelBuilder: (key) => key == 'Без альбома' ? key : '$key (+${_albumOptions[key]} ₸)',
             ),
           ),
           _buildSectionCard(
@@ -205,14 +219,14 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
   Widget _buildSectionCard({required String title, required String subtitle, required Widget child}) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(subtitle, style: const TextStyle(fontSize: 14, color: Colors.black54)),
-            const SizedBox(height: 12),
+            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 8),
+            Text(subtitle, style: const TextStyle(fontSize: 15, color: Colors.white70)),
+            const SizedBox(height: 16),
             child,
           ],
         ),
@@ -222,8 +236,8 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
 
   Widget _buildColorSelector() {
     return Wrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
+      spacing: 12.0,
+      runSpacing: 12.0,
       children: _colors.map((color) {
         final isSelected = _selectedColor == color;
         return ChoiceChip(
@@ -238,15 +252,17 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
           },
           selectedColor: Theme.of(context).colorScheme.primary,
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+            color: isSelected ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-          backgroundColor: Colors.grey[200],
+          backgroundColor: Colors.white.withOpacity(0.1),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             side: BorderSide(
-              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey[300]!,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.white.withOpacity(0.2),
             ),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         );
       }).toList(),
     );
@@ -261,7 +277,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
     return Column(
       children: options.keys.map((key) {
         return RadioListTile<T>(
-          title: Text(labelBuilder(key)),
+          title: Text(labelBuilder(key), style: const TextStyle(color: Colors.white, fontSize: 16)),
           value: key,
           groupValue: groupValue,
           onChanged: onChanged,
@@ -273,29 +289,33 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
   }
 
   Widget _buildPriceFooter() {
-    return Column(
-      children: [
-        Text(
-          'Итоговая цена: ${_totalPrice.toStringAsFixed(0)} ₸',
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-        if (_isOrderComplete())
-          ElevatedButton.icon(
-            onPressed: _sendOrderToWhatsApp,
-            icon: const Icon(Icons.chat_bubble_outline),
-            label: const Text('💬 Отправить заказ в WhatsApp'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        children: [
+          Text(
+            'Итоговая цена: ${_totalPrice.toStringAsFixed(0)} ₸',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 24),
+          if (_isOrderComplete())
+            ElevatedButton.icon(
+              onPressed: _sendOrderToWhatsApp,
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              label: const Text('💬 Отправить заказ в WhatsApp', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 5,
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
