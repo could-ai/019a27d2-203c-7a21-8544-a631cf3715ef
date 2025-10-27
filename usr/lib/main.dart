@@ -17,10 +17,10 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: const Color(0xFF170B33),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
+          seedColor: const Color(0xFF170B33),
           brightness: Brightness.dark,
           primary: Colors.purple.shade300,
-          secondary: Colors.amber,
+          secondary: Colors.amber.shade700, // Золотистый цвет
         ),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFF170B33),
@@ -30,23 +30,24 @@ class MyApp extends StatelessWidget {
           centerTitle: true,
           titleTextStyle: TextStyle(
             color: Colors.white,
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
           ),
         ),
         cardTheme: CardTheme(
-          elevation: 2,
-          color: const Color(0xFF23154C),
-          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          elevation: 4,
+          color: const Color(0xFF23154C).withOpacity(0.8),
+          margin: const EdgeInsets.symmetric(vertical: 12.0),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
         ),
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.white70),
+          bodyMedium: TextStyle(color: Colors.white70, fontSize: 16),
           headlineSmall: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
         ),
       ),
       home: const PhotoboxOrderScreen(),
@@ -62,7 +63,6 @@ class PhotoboxOrderScreen extends StatefulWidget {
 }
 
 class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
-  // State variables for user selections
   String? _selectedColor;
   int? _selectedPhotoCount;
   String? _selectedAlbum;
@@ -70,7 +70,6 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
 
   double _totalPrice = 0.0;
 
-  // Prices
   static const double _price12Photos = 5000;
   static const double _price20Photos = 7000;
   static const double _album20PhotosPrice = 2000;
@@ -124,8 +123,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
 - Итоговая сумма: $_totalPrice ₸ 
 """;
 
-    // TODO: Replace with your actual phone number
-    const String phoneNumber = "+71234567890"; 
+    const String phoneNumber = "+71234567890";
     final Uri whatsappUrl = Uri.parse(
       "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(orderSummary)}",
     );
@@ -133,7 +131,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
     } else {
-      if(mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Не удалось открыть WhatsApp.")),
         );
@@ -145,28 +143,44 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🖤 Оформляем заказ от Photobox'),
+        title: const Text('🖤 Оформляем заказ'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: const Text(
-              'Выберите формат, цвет, количество фотографий и доп. опции — и мы создадим ваш идеальный фотобокс.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.white70),
+            child: Column(
+              children: [
+                Text(
+                  'Магазин медиа | Photobox',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Выберите формат, цвет, количество фотографий и доп. опции — и мы создадим ваш идеальный фотобокс.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
           _buildSectionCard(
             title: '1. Цвет Photobox',
             subtitle: 'Выберите цвет корпуса:',
+            imageUrl: 'https://images.unsplash.com/photo-1526048598645-62b31f82b8f7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             child: _buildColorSelector(),
           ),
           _buildSectionCard(
             title: '2. Количество фотографий',
             subtitle: 'Сколько фото добавить:',
+            imageUrl: 'https://images.unsplash.com/photo-1516558614843-5d5e09a3d58a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             child: _buildRadioGroup<int>(
               options: _photoOptions,
               groupValue: _selectedPhotoCount,
@@ -182,6 +196,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
           _buildSectionCard(
             title: '3. Мини-альбом',
             subtitle: 'Хотите добавить мини-альбом?',
+            imageUrl: 'https://images.unsplash.com/photo-1594313396236-7b357734e152?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             child: _buildRadioGroup<String>(
               options: _albumOptions,
               groupValue: _selectedAlbum,
@@ -197,6 +212,7 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
           _buildSectionCard(
             title: '4. Фотомузыка',
             subtitle: 'Добавьте фотомузыку для атмосферы:',
+            imageUrl: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             child: _buildRadioGroup<bool>(
               options: _musicOptions,
               groupValue: _withMusic,
@@ -216,20 +232,45 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required String subtitle, required Widget child}) {
+  Widget _buildSectionCard({required String title, required String subtitle, required Widget child, required String imageUrl}) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 8),
-            Text(subtitle, style: const TextStyle(fontSize: 15, color: Colors.white70)),
-            const SizedBox(height: 16),
-            child,
-          ],
-        ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 150,
+            width: double.infinity,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.red, size: 48),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 16),
+                child,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -250,16 +291,16 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
               }
             });
           },
-          selectedColor: Theme.of(context).colorScheme.primary,
+          selectedColor: Theme.of(context).colorScheme.secondary,
           labelStyle: TextStyle(
-            color: isSelected ? Colors.black : Colors.white,
+            color: isSelected ? const Color(0xFF170B33) : Colors.white,
             fontWeight: FontWeight.bold,
           ),
           backgroundColor: Colors.white.withOpacity(0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
             side: BorderSide(
-              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.white.withOpacity(0.2),
+              color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.white.withOpacity(0.2),
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -282,15 +323,20 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
           groupValue: groupValue,
           onChanged: onChanged,
           contentPadding: EdgeInsets.zero,
-          activeColor: Theme.of(context).colorScheme.primary,
+          activeColor: Theme.of(context).colorScheme.secondary,
         );
       }).toList(),
     );
   }
 
   Widget _buildPriceFooter() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+    return Container(
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF23154C).withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
       child: Column(
         children: [
           Text(
@@ -313,6 +359,12 @@ class _PhotoboxOrderScreenState extends State<PhotoboxOrderScreen> {
                 ),
                 elevation: 5,
               ),
+            )
+          else
+            Text(
+              'Пожалуйста, выберите все опции, чтобы продолжить',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 16),
             ),
         ],
       ),
